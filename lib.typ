@@ -39,30 +39,61 @@
   let author-list = if authors != none { authors }
     else { ((name: author, email: email, roll: roll),) }
 
-  set document(title: title, author: author-list.map(a => a.name))
+  let document-authors = author-list.filter(a => a.name != none).map(a => a.name)
+  set document(title: title, author: document-authors)
   set page(paper: "a4", margin: (x: 1.5cm, y: 2cm))
   set text(font: font-family, size: font-size, lang: "en")
   set par(justify: true, first-line-indent: 0pt)
 
   if num_of_authors > 1 {
     // ── Multi-author table header ──────────────────────────────────────────
-        align(center)[*Course:* #course] 
-        v(-0.5cm)
-        align(center)[#text(weight: "bold", size: 14pt)[#title]]
-        v(-0.4cm)
-        align(center)[*Date:* #date]
-        v(-0.1cm)
-        line(length: 100%, stroke: 1.5pt)
-        v(-0.3cm)
+    if course != none {
+      align(center)[*Course:* #course]
+      v(-0.5cm)
+    }
+    if title != none {
+      align(center)[#text(weight: "bold", size: 14pt)[#title]]
+      v(-0.4cm)
+    }
+    if date != none {
+      align(center)[*Date:* #date]
+      v(-0.1cm)
+    }
+    line(length: 100%, stroke: 1.5pt)
+    v(-0.3cm)
+    let author-columns = author-list.len()
+    let author-row(values, style, label: none) = {
+      if values.filter(value => value != none).len() > 0 {
+        values.map(value => if value == none {
+          []
+        } else if label == none {
+          style(value)
+        } else {
+          text()[#label: #style(value)]
+        })
+      } else {
+        ()
+      }
+    }
     table(
-      columns: (1fr,) * num_of_authors,
+      columns: (1fr,) * author-columns,
       align: center + horizon,
       stroke: 0pt,
       inset: 3pt,
-      // Author names
-      ..author-list.map(a => text(weight: "bold")[#a.name]),
-      // Author roll numbers
-      ..author-list.map(a => text()[Roll: #a.roll]),
+      ..author-row(
+        author-list.map(a => a.name),
+        value => text(weight: "bold")[#value],
+      ),
+      ..author-row(
+        author-list.map(a => a.email),
+        value => link("mailto:" + value)[#value],
+        label: "Email",
+      ),
+      ..author-row(
+        author-list.map(a => a.roll),
+        value => [#value],
+        label: "Roll",
+      ),
     )
   } else {
     // ── Single-author header ───────────────────────────────────────────────
@@ -71,14 +102,14 @@
       columns: (1fr, 1fr),
       gutter: 1em,
       align(left)[
-        #text(size: 14pt, weight: "bold")[#a.name] \
-        Email: #link("mailto:" + a.email)[#a.email] \
-        Roll: #a.roll
+        #if a.name != none [#text(size: 14pt, weight: "bold")[#a.name] #linebreak()]
+        #if a.email != none [Email: #link("mailto:" + a.email)[#a.email] #linebreak()]
+        #if a.roll != none [Roll: #a.roll]
       ],
       align(right)[
-        #text(size: 14pt, weight: "bold")[#title] \
-        Course: #text(size: 11pt)[#course] \
-        Date: #date
+        #if title != none [#text(size: 14pt, weight: "bold")[#title] #linebreak()]
+        #if course != none [Course: #text(size: 11pt)[#course] #linebreak()]
+        #if date != none [Date: #date]
       ]
     )
   }

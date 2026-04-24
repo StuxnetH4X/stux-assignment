@@ -68,7 +68,7 @@ Or pass a custom color dictionary:
 
 ### Multiple Authors
 
-For group assignments, set `num_of_authors` and pass an `authors` array. The header switches to a centered layout with an author table:
+For group assignments, set `num_of_authors` and pass an `authors` array. The header switches to a centered layout with an author table. Author rows with only `none` values are omitted automatically in both the single-author and multi-author layouts:
 
 ```
           Course: CS 101
@@ -87,8 +87,8 @@ For group assignments, set `num_of_authors` and pass an `authors` array. The hea
   num_of_authors: 3,
   authors: (
     (name: "Alice", email: "alice@example.com", roll: "101"),
-    (name: "Bob",   email: "bob@example.com",   roll: "102"),
-    (name: "Charlie",   email: "charlie@example.com",   roll: "103"),
+    (name: "Bob", email: none, roll: "102"),
+    (name: "Charlie", email: "charlie@example.com", roll: none),
   ),
   course: "CS 101",
 )
