@@ -17,9 +17,9 @@ Or import it manually in an existing file:
 
 #show: assignment.with(
   title: "Assignment - 1",
-  author: "Your Name",
-  email: "you@example.com",
-  roll: "123456",
+  authors: (
+    (name: "Your Name", email: "you@example.com", roll: "123456"),
+  ),
   course: "CS 101",
 )
 
@@ -68,7 +68,9 @@ Or pass a custom color dictionary:
 
 ### Multiple Authors
 
-For group assignments, set `num_of_authors` and pass an `authors` array. The header switches to a centered layout with an author table:
+Pass an `authors` array. A single entry renders the standard side-by-side header, while multiple entries switch to the centered author table. Author rows with only `none` values are omitted automatically in both layouts.
+
+The legacy `author`, `email`, `roll`, and `num_of_authors` arguments are still accepted for backward compatibility. Supplying `authors` together with any legacy author arguments is an error.
 
 ```
           Course: CS 101
@@ -84,11 +86,10 @@ For group assignments, set `num_of_authors` and pass an `authors` array. The hea
 
 #show: assignment.with(
   title: "Group Assignment - 1",
-  num_of_authors: 3,
   authors: (
     (name: "Alice", email: "alice@example.com", roll: "101"),
-    (name: "Bob",   email: "bob@example.com",   roll: "102"),
-    (name: "Charlie",   email: "charlie@example.com",   roll: "103"),
+    (name: "Bob", email: none, roll: "102"),
+    (name: "Charlie", email: "charlie@example.com", roll: none),
   ),
   course: "CS 101",
 )
@@ -96,7 +97,7 @@ For group assignments, set `num_of_authors` and pass an `authors` array. The hea
 
 ![Example](/thumbnail.png)
 
-When `num_of_authors` is `1` (the default), the single-author shorthand (`author`, `email`, `roll`) is used with the standard side-by-side header.
+For single-author assignments, pass a one-entry `authors` array. The legacy single-author shorthand still works, but `authors` is the preferred API.
 
 ### Font Customization
 
@@ -117,21 +118,23 @@ Defaults are `11pt` and `"Linux Libertine"`.
 | Parameter     | Default                             | Description                                  |
 | ------------- | ----------------------------------- | -------------------------------------------- |
 | `title`       | `"Assignment"`                      | Assignment title                             |
-| `author`      | `"Student Name"`                    | Single author name                           |
-| `email`       | `"email@example.com"`               | Single author email                          |
-| `roll`        | `"123456"`                          | Single author roll number                    |
-| `num_of_authors` | `1`                              | Set > 1 for multi-author table header        |
-| `authors`     | `none`                              | Array of `(name, email, roll)` dictionaries  |
+| `author`      | `auto`                              | Legacy single-author name                    |
+| `email`       | `auto`                              | Legacy single-author email                   |
+| `roll`        | `auto`                              | Legacy single-author roll number             |
+| `num_of_authors` | `auto`                           | Legacy multi-author switch                   |
+| `authors`     | `auto`                              | Preferred array of `(name, email, roll)` dictionaries |
 | `course`      | `"Course Name"`                     | Course identifier                            |
 | `date`        | today's date                        | Display date                                 |
 | `theme`       | `"teal"`                            | Theme name or custom `(bg: …, fr: …)` dict   |
 | `font-size`   | `11pt`                              | Document font size                           |
 | `font-family` | `"Linux Libertine"`                 | Document font family                         |
+| `show-solutions` | `true`                           | Whether to render `#solution` blocks         |
 
 ## Template Functions
 
-- **`#problem(title: none)[…]`** — Numbered problem box styled with the active theme. Optional `title` appears after the number.
-- **`#solution[…]`** — Indented solution block with an italic "Solution:" label.
+- **`#problem(title: none, label: none)[…]`** — Numbered problem box styled with the active theme. Optional `title` appears after the number and `label` can be referenced elsewhere.
+- **`#solution[…]`** — Indented solution block with an italic "Solution:" label. Hidden when `show-solutions: false`.
+>>>>>>> 365fff2 (Add solution toggle)
 
 
 ## License
